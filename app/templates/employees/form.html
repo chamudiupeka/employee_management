@@ -1,0 +1,560 @@
+{% extends "base.html" %} {% block title %}{{ "Edit Employee" if employee else
+"Add Employee" }}{% endblock %} {% block content %}
+<div class="max-w-2xl mx-auto py-8 px-4">
+  <!-- Header Section -->
+  <div
+    class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 mb-8 text-white"
+  >
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            {% if employee %}
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+            {% else %}
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+            />
+            {% endif %}
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold">
+            {% if employee %}Edit Employee{% else %}Add New Employee{% endif %}
+          </h2>
+          <p class="text-blue-100">
+            {% if employee %}Update {{ employee[1] }} {{ employee[2] }}'s
+            information{% else %}Fill in the details to add a new employee{%
+            endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %} {% if category ==
+  'success' %}
+  <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg
+          class="h-5 w-5 text-green-400"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-green-800">{{ message }}</p>
+      </div>
+    </div>
+  </div>
+  {% endif %} {% endfor %} {% endif %} {% endwith %}
+
+  <!-- Form -->
+  <div class="bg-white rounded-lg border border-gray-200 p-6">
+    <form method="POST" class="space-y-6">
+      <!-- First Row: First Name & Last Name -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label
+            for="first_name"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >First Name <span class="text-red-500">*</span></label
+          >
+          <input
+            id="first_name"
+            type="text"
+            name="first_name"
+            placeholder="John"
+            value="{% if form_data %}{{ form_data['first_name'] }}{% elif employee %}{{ employee[1] }}{% endif %}"
+            required
+            class="w-full px-3 py-2 border {% if field_errors and field_errors.get('first_name') %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          {% if field_errors and field_errors.get('first_name') %}
+          <p class="text-red-600 text-sm mt-1">
+            {{ field_errors['first_name'] }}
+          </p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="last_name"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >Last Name <span class="text-red-500">*</span></label
+          >
+          <input
+            id="last_name"
+            type="text"
+            name="last_name"
+            placeholder="Doe"
+            value="{% if form_data %}{{ form_data['last_name'] }}{% elif employee %}{{ employee[2] }}{% endif %}"
+            required
+            class="w-full px-3 py-2 border {% if field_errors and field_errors.get('last_name') %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          {% if field_errors and field_errors.get('last_name') %}
+          <p class="text-red-600 text-sm mt-1">
+            {{ field_errors['last_name'] }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Second Row: Email & Phone -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label
+            for="email"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >Email <span class="text-red-500">*</span></label
+          >
+          <input
+            id="email"
+            type="email"
+            name="email"
+            placeholder="john.doe@example.com"
+            value="{% if form_data %}{{ form_data['email'] }}{% elif employee %}{{ employee[3] }}{% endif %}"
+            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+            title="Please enter a valid email address"
+            required
+            class="w-full px-3 py-2 border {% if field_errors and field_errors.get('email') %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          {% if field_errors and field_errors.get('email') %}
+          <p class="text-red-600 text-sm mt-1">{{ field_errors['email'] }}</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="phone"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >Phone <span class="text-gray-500 text-xs">(Optional)</span></label
+          >
+          <input
+            id="phone"
+            type="tel"
+            name="phone"
+            placeholder="+1 (555) 000-0000"
+            value="{% if form_data %}{{ form_data['phone'] }}{% elif employee %}{{ employee[4] or '' }}{% endif %}"
+            pattern="[\d\s\-\(\)\+]+"
+            title="Please enter a valid phone number"
+            class="w-full px-3 py-2 border {% if field_errors and field_errors.get('phone') %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          {% if field_errors and field_errors.get('phone') %}
+          <p class="text-red-600 text-sm mt-1">{{ field_errors['phone'] }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Third Row: Department & Position -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label
+            for="department"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >Department
+            <span class="text-gray-500 text-xs">(Optional)</span></label
+          >
+          <input
+            id="department"
+            type="text"
+            name="department"
+            placeholder="Engineering"
+            value="{% if form_data %}{{ form_data['department'] }}{% elif employee %}{{ employee[5] or '' }}{% endif %}"
+            class="w-full px-3 py-2 border {% if field_errors and field_errors.get('department') %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          {% if field_errors and field_errors.get('department') %}
+          <p class="text-red-600 text-sm mt-1">
+            {{ field_errors['department'] }}
+          </p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="position"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >Position
+            <span class="text-gray-500 text-xs">(Optional)</span></label
+          >
+          <input
+            id="position"
+            type="text"
+            name="position"
+            placeholder="Software Engineer"
+            value="{% if form_data %}{{ form_data['position'] }}{% elif employee %}{{ employee[6] or '' }}{% endif %}"
+            class="w-full px-3 py-2 border {% if field_errors and field_errors.get('position') %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          {% if field_errors and field_errors.get('position') %}
+          <p class="text-red-600 text-sm mt-1">
+            {{ field_errors['position'] }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Fourth Row: Salary & Hire Date -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label
+            for="salary"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >Salary <span class="text-gray-500 text-xs">(Optional)</span></label
+          >
+          <input
+            id="salary"
+            type="number"
+            name="salary"
+            placeholder="50000.00"
+            value="{% if form_data %}{{ form_data['salary'] }}{% elif employee %}{{ employee[7] or '' }}{% endif %}"
+            min="0"
+            max="9999999.99"
+            step="0.01"
+            title="Please enter a valid salary amount"
+            class="w-full px-3 py-2 border {% if field_errors and field_errors.get('salary') %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          {% if field_errors and field_errors.get('salary') %}
+          <p class="text-red-600 text-sm mt-1">{{ field_errors['salary'] }}</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="hire_date"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >Hire Date
+            <span class="text-gray-500 text-xs">(Optional)</span></label
+          >
+          <input
+            id="hire_date"
+            type="date"
+            name="hire_date"
+            value="{% if form_data %}{{ form_data['hire_date'] }}{% elif employee %}{{ employee[8] or '' }}{% endif %}"
+            class="w-full px-3 py-2 border {% if field_errors and field_errors.get('hire_date') %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          {% if field_errors and field_errors.get('hire_date') %}
+          <p class="text-red-600 text-sm mt-1">
+            {{ field_errors['hire_date'] }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end space-x-3 pt-6">
+        <a
+          href="{{ url_for('employees.list_employees') }}"
+          class="px-6 py-2 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-md hover:shadow-lg"
+        >
+          Cancel
+        </a>
+        <button
+          type="submit"
+          class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-md hover:shadow-lg"
+        >
+          Save Employee
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- JavaScript for Enhanced Validation -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+
+    // Field configurations with their limits
+    const fieldConfigs = {
+      first_name: { maxLength: 100, required: true },
+      last_name: { maxLength: 100, required: true },
+      email: { maxLength: 150, required: true },
+      phone: { maxLength: 20, required: false },
+      department: { maxLength: 100, required: false },
+      position: { maxLength: 100, required: false },
+    };
+
+    // Helper function to show field error
+    function showFieldError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      const existingError = field.parentNode.querySelector('.text-red-600');
+
+      // Remove existing error message
+      if (existingError) {
+        existingError.remove();
+      }
+
+      // Add error styling to field
+      field.classList.remove('border-gray-300');
+      field.classList.add('border-red-500', 'bg-red-50');
+
+      // Add error message
+      const errorDiv = document.createElement('p');
+      errorDiv.className = 'text-red-600 text-sm mt-1';
+      errorDiv.textContent = message;
+      field.parentNode.appendChild(errorDiv);
+    }
+
+    // Helper function to clear field error
+    function clearFieldError(fieldId) {
+      const field = document.getElementById(fieldId);
+      const existingError = field.parentNode.querySelector('.text-red-600');
+
+      if (existingError) {
+        existingError.remove();
+      }
+
+      // Remove error styling
+      field.classList.remove('border-red-500', 'bg-red-50');
+      field.classList.add('border-gray-300');
+    }
+
+    // Set up validation for each text field
+    Object.keys(fieldConfigs).forEach((fieldId) => {
+      const field = document.getElementById(fieldId);
+      const config = fieldConfigs[fieldId];
+
+      if (!field) {
+        console.log('Field not found:', fieldId);
+        return;
+      }
+
+      console.log(
+        'Setting up validation for:',
+        fieldId,
+        'Max length:',
+        config.maxLength,
+      );
+
+      // Real-time character limit check
+      field.addEventListener('input', function () {
+        const currentLength = this.value.length;
+        const fieldName = fieldId
+          .replace('_', ' ')
+          .replace(/\b\w/g, (l) => l.toUpperCase());
+
+        console.log(
+          `${fieldId} input event - length: ${currentLength}, max: ${config.maxLength}`,
+        );
+
+        // Show error if exceeding limit
+        if (currentLength > config.maxLength) {
+          console.log(`${fieldId} exceeds limit - showing error`);
+          showFieldError(
+            fieldId,
+            `${fieldName} must not exceed ${config.maxLength} characters`,
+          );
+        } else {
+          clearFieldError(fieldId);
+        }
+      });
+
+      // Add paste event listener as well
+      field.addEventListener('paste', function (e) {
+        setTimeout(() => {
+          const currentLength = this.value.length;
+          const fieldName = fieldId
+            .replace('_', ' ')
+            .replace(/\b\w/g, (l) => l.toUpperCase());
+
+          console.log(
+            `${fieldId} paste event - length: ${currentLength}, max: ${config.maxLength}`,
+          );
+
+          if (currentLength > config.maxLength) {
+            console.log(`${fieldId} exceeds limit after paste - showing error`);
+            showFieldError(
+              fieldId,
+              `${fieldName} must not exceed ${config.maxLength} characters`,
+            );
+          } else {
+            clearFieldError(fieldId);
+          }
+        }, 0);
+      });
+
+      // Validation on blur
+      field.addEventListener('blur', function () {
+        const value = this.value.trim();
+        const fieldName = fieldId
+          .replace('_', ' ')
+          .replace(/\b\w/g, (l) => l.toUpperCase());
+
+        console.log(
+          `${fieldId} blur event - length: ${value.length}, max: ${config.maxLength}`,
+        );
+
+        // Required field validation
+        if (config.required && !value) {
+          showFieldError(fieldId, `${fieldName} is required`);
+          return;
+        }
+
+        // Character limit validation
+        if (value.length > config.maxLength) {
+          console.log(`${fieldId} exceeds limit on blur - showing error`);
+          showFieldError(
+            fieldId,
+            `${fieldName} must not exceed ${config.maxLength} characters`,
+          );
+        } else {
+          clearFieldError(fieldId);
+        }
+      });
+    });
+
+    // Special validation for email format
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener('blur', function () {
+      const email = this.value.trim();
+      const config = fieldConfigs.email;
+
+      if (email) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (email.length > config.maxLength) {
+          showFieldError(
+            'email',
+            `Email must not exceed ${config.maxLength} characters`,
+          );
+        } else if (!emailRegex.test(email)) {
+          showFieldError('email', 'Please enter a valid email address');
+        } else {
+          clearFieldError('email');
+        }
+      }
+    });
+
+    // Special validation for phone format
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('blur', function () {
+      const phone = this.value.trim();
+      const config = fieldConfigs.phone;
+
+      if (phone) {
+        if (phone.length > config.maxLength) {
+          showFieldError(
+            'phone',
+            `Phone must not exceed ${config.maxLength} characters`,
+          );
+        } else {
+          const phoneRegex = /^[\d\s\-\(\)\+]+$/;
+          if (!phoneRegex.test(phone)) {
+            showFieldError('phone', 'Please enter a valid phone number format');
+          } else {
+            clearFieldError('phone');
+          }
+        }
+      }
+    });
+
+    // Salary validation
+    const salaryInput = document.getElementById('salary');
+    if (salaryInput) {
+      salaryInput.addEventListener('blur', function () {
+        const salary = this.value.trim();
+        if (salary) {
+          const salaryNum = parseFloat(salary);
+          if (isNaN(salaryNum) || salaryNum < 0) {
+            showFieldError(
+              'salary',
+              'Please enter a valid positive salary amount',
+            );
+          } else if (salaryNum > 9999999.99) {
+            showFieldError('salary', 'Salary exceeds maximum allowed value');
+          } else {
+            clearFieldError('salary');
+          }
+        }
+      });
+    }
+
+    // Form submission validation
+    form.addEventListener('submit', function (e) {
+      let hasErrors = false;
+
+      // Validate all configured fields
+      Object.keys(fieldConfigs).forEach((fieldId) => {
+        const field = document.getElementById(fieldId);
+        const config = fieldConfigs[fieldId];
+        const value = field.value.trim();
+        const fieldName = fieldId
+          .replace('_', ' ')
+          .replace(/\b\w/g, (l) => l.toUpperCase());
+
+        // Required field check
+        if (config.required && !value) {
+          showFieldError(fieldId, `${fieldName} is required`);
+          hasErrors = true;
+          return;
+        }
+
+        // Character limit check
+        if (value && value.length > config.maxLength) {
+          showFieldError(
+            fieldId,
+            `${fieldName} must not exceed ${config.maxLength} characters`,
+          );
+          hasErrors = true;
+        }
+      });
+
+      // Email format validation
+      const email = emailInput.value.trim();
+      if (email) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(email)) {
+          showFieldError('email', 'Please enter a valid email address');
+          hasErrors = true;
+        }
+      }
+
+      // Phone format validation
+      const phone = phoneInput.value.trim();
+      if (phone) {
+        const phoneRegex = /^[\d\s\-\(\)\+]+$/;
+        if (!phoneRegex.test(phone)) {
+          showFieldError('phone', 'Please enter a valid phone number format');
+          hasErrors = true;
+        }
+      }
+
+      if (hasErrors) {
+        e.preventDefault();
+        // Scroll to first error field
+        const firstErrorField = document.querySelector('.border-red-500');
+        if (firstErrorField) {
+          firstErrorField.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+          firstErrorField.focus();
+        }
+      }
+    });
+  });
+</script>
+
+{% endblock %}

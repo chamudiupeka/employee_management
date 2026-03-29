@@ -9,45 +9,268 @@
       href="{{ url_for('static', filename='css/output.css') }}"
     />
   </head>
-  <body class="bg-gray-100 min-h-screen">
-    <nav class="bg-blue-700 text-white p-4 shadow">
-      <div class="max-w-6xl mx-auto flex justify-between items-center">
-        <a href="{{ url_for('home.index') }}" class="text-xl font-bold">EMS</a>
-        <div class="space-x-4">
-          <a href="{{ url_for('home.index') }}" class="hover:underline">Home</a>
-          {% if g.user %}
+  <body class="bg-gray-50 min-h-screen pt-16">
+    <nav
+      class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-700 to-indigo-700 text-white shadow-lg"
+    >
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
           <a
-            href="{{ url_for('employees.list_employees') }}"
-            class="hover:underline"
-            >Employees</a
+            href="{{ url_for('home.index') }}"
+            class="text-xl font-bold flex items-center space-x-2 hover:scale-105 transition-transform"
           >
-          <a
-            href="{{ url_for('employees.create_employee') }}"
-            class="hover:underline"
-            >Add Employee</a
-          >
-          <span class="text-sm">Hi, {{ g.user[1] }}</span>
-          <a href="{{ url_for('auth.logout') }}" class="hover:underline"
-            >Logout</a
-          >
-          {% else %}
-          <a href="{{ url_for('auth.login') }}" class="hover:underline"
-            >Login</a
-          >
-          {% endif %}
+            <div
+              class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"
+                ></path>
+              </svg>
+            </div>
+            <span>EMS</span>
+          </a>
+          <div class="flex items-center space-x-2">
+            <a href="{{ url_for('home.index') }}" class="nav-link">Home</a>
+            {% if g.user %}
+            <a href="{{ url_for('employees.list_employees') }}" class="nav-link"
+              >Employees</a
+            >
+            <a
+              href="{{ url_for('employees.create_employee') }}"
+              class="nav-link"
+              >Add Employee</a
+            >
+            <div class="border-l border-blue-600 pl-4 ml-2">
+              <span class="text-sm text-blue-100">Hi, {{ g.user[1] }}</span>
+              <form
+                method="POST"
+                action="{{ url_for('auth.logout') }}"
+                class="inline"
+              >
+                <button
+                  type="submit"
+                  class="ml-4 px-3 py-1 bg-blue-600 bg-opacity-50 rounded-lg hover:bg-opacity-70 transition-all text-sm cursor-pointer"
+                >
+                  Logout
+                </button>
+              </form>
+            </div>
+            {% else %}
+            <a
+              href="{{ url_for('auth.login') }}"
+              class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all backdrop-blur-sm"
+            >
+              Login
+            </a>
+            {% endif %}
+          </div>
         </div>
       </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto p-6">
-      {% with messages = get_flashed_messages(with_categories=true) %} {% if
-      messages %} {% for category, message in messages %}
+    <!-- Breadcrumb Navigation -->
+    {% if breadcrumbs %}
+    <div class="max-w-6xl mx-auto px-6 py-3">
+      <nav class="flex" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+          {% for crumb in breadcrumbs %} {% if loop.last %}
+          <li aria-current="page">
+            <div class="flex items-center">
+              {% if not loop.first %}
+              <svg
+                class="w-5 h-5 text-gray-400 mx-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              {% endif %}
+              <span class="text-sm font-semibold text-blue-600">
+                {{ crumb.label }}
+              </span>
+            </div>
+          </li>
+          {% else %}
+          <li>
+            <div class="flex items-center">
+              {% if not loop.first %}
+              <svg
+                class="w-5 h-5 text-gray-400 mx-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              {% endif %}
+              <a
+                href="{{ crumb.url }}"
+                class="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-200"
+              >
+                {{ crumb.label }}
+              </a>
+            </div>
+          </li>
+          {% endif %} {% endfor %}
+        </ol>
+      </nav>
+    </div>
+    {% endif %}
+
+    <!-- Toast notifications container -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div
+      id="toast-container"
+      style="
+        position: fixed;
+        top: 80px;
+        right: 16px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        pointer-events: none;
+      "
+    >
+      {% for category, message in messages %}
       <div
-        class="mb-4 p-4 rounded {% if category == 'success' %}bg-green-100 text-green-800 {% elif category == 'error' %}bg-red-100 text-red-800 {% else %}bg-gray-100 text-gray-800{% endif %}"
+        class="toast-message toast-{{ category }}"
+        style="
+          pointer-events: auto;
+          padding: 8px 12px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 12px;
+          font-weight: 500;
+          color: white;
+          max-width: 220px;
+          animation: slideInFromRight 0.3s ease-out forwards;
+        "
       >
-        {{ message }}
+        <div class="flex-shrink-0">
+          {% if category == 'success' %}
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+          {% elif category == 'error' %}
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+          {% elif category == 'warning' %}
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+          {% else %}
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+          {% endif %}
+        </div>
+        <span>{{ message }}</span>
       </div>
-      {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
-    </main>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <main class="max-w-6xl mx-auto p-6">{% block content %}{% endblock %}</main>
+
+    <style>
+      @keyframes slideInFromRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOutToRight {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+
+      .toast-success {
+        background-color: #22c55e;
+      }
+
+      .toast-error {
+        background-color: #ef4444;
+      }
+
+      .toast-warning {
+        background-color: #eab308;
+      }
+
+      .toast-message:not(.toast-success):not(.toast-error):not(.toast-warning) {
+        background-color: #3b82f6;
+      }
+    </style>
+
+    <script>
+      // Auto-hide toast messages after 2 seconds
+      document.addEventListener('DOMContentLoaded', function () {
+        const toastMessages = document.querySelectorAll('.toast-message');
+
+        toastMessages.forEach(function (toast, index) {
+          // Auto-hide after 2 seconds (staggered for multiple messages)
+          setTimeout(
+            function () {
+              // Add slide-out animation
+              toast.style.animation = 'slideOutToRight 0.3s ease-out forwards';
+
+              // Remove element after animation completes
+              setTimeout(function () {
+                if (toast.parentNode) {
+                  toast.parentNode.removeChild(toast);
+
+                  // Remove container if no more toasts
+                  const container = document.getElementById('toast-container');
+                  if (container && container.children.length === 0) {
+                    container.parentNode.removeChild(container);
+                  }
+                }
+              }, 300);
+            },
+            2000 + index * 200,
+          );
+        });
+      });
+    </script>
   </body>
 </html>
