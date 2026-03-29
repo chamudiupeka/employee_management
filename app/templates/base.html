@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Employee Management System{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/output.css') }}"
+    />
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <nav class="bg-blue-700 text-white p-4 shadow">
+      <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <a href="{{ url_for('home.index') }}" class="text-xl font-bold">EMS</a>
+        <div class="space-x-4">
+          <a href="{{ url_for('home.index') }}" class="hover:underline">Home</a>
+          <a
+            href="{{ url_for('employees.list_employees') }}"
+            class="hover:underline"
+            >Employees</a
+          >
+          <a
+            href="{{ url_for('employees.create_employee') }}"
+            class="hover:underline"
+            >Add Employee</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-6">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div
+        class="mb-4 p-4 rounded {% if category == 'success' %}bg-green-100 text-green-800 {% elif category == 'error' %}bg-red-100 text-red-800 {% else %}bg-gray-100 text-gray-800{% endif %}"
+      >
+        {{ message }}
+      </div>
+      {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

@@ -1,0 +1,70 @@
+{% extends "base.html" %} {% block title %}Edit Employee{% endblock %} {% block
+content %}
+<div class="bg-white shadow rounded-lg p-6 max-w-3xl mx-auto">
+  <h2 class="text-2xl font-bold mb-6">Edit Employee</h2>
+
+  <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <input
+      type="text"
+      name="first_name"
+      value="{{ employee[1] }}"
+      required
+      class="border rounded px-4 py-2"
+    />
+    <input
+      type="text"
+      name="last_name"
+      value="{{ employee[2] }}"
+      required
+      class="border rounded px-4 py-2"
+    />
+    <input
+      type="email"
+      name="email"
+      value="{{ employee[3] }}"
+      required
+      class="border rounded px-4 py-2"
+    />
+    <input
+      type="text"
+      name="phone"
+      value="{{ employee[4] }}"
+      class="border rounded px-4 py-2"
+    />
+    <input
+      type="text"
+      name="department"
+      value="{{ employee[5] }}"
+      class="border rounded px-4 py-2"
+    />
+    <input
+      type="text"
+      name="position"
+      value="{{ employee[6] }}"
+      class="border rounded px-4 py-2"
+    />
+    <input
+      type="number"
+      step="0.01"
+      name="salary"
+      value="{{ employee[7] }}"
+      class="border rounded px-4 py-2"
+    />
+    <input
+      type="date"
+      name="hire_date"
+      value="{{ employee[8] }}"
+      class="border rounded px-4 py-2"
+    />
+
+    <div class="md:col-span-2">
+      <button
+        type="submit"
+        class="bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700"
+      >
+        Update Employee
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
