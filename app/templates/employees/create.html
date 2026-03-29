@@ -1,0 +1,117 @@
+{% extends "base.html" %} {% block title %}Add Employee{% endblock %} {% block
+content %}
+<div class="bg-white shadow rounded-lg p-6 max-w-3xl mx-auto">
+  <h2 class="text-2xl font-bold mb-6">Add Employee</h2>
+
+  <form method="POST" class="grid grid-cols-1 gap-4">
+    <div class="flex flex-col gap-1">
+      <label for="first_name" class="text-sm font-medium text-gray-700"
+        >First Name:</label
+      >
+      <input
+        id="first_name"
+        type="text"
+        name="first_name"
+        placeholder="First Name"
+        required
+        class="border rounded px-4 py-2"
+      />
+    </div>
+    <div class="flex flex-col gap-1">
+      <label for="last_name" class="text-sm font-medium text-gray-700"
+        >Last Name:</label
+      >
+      <input
+        id="last_name"
+        type="text"
+        name="last_name"
+        placeholder="Last Name"
+        required
+        class="border rounded px-4 py-2"
+      />
+    </div>
+    <div class="flex flex-col gap-1">
+      <label for="email" class="text-sm font-medium text-gray-700"
+        >Email:</label
+      >
+      <input
+        id="email"
+        type="email"
+        name="email"
+        placeholder="Email"
+        required
+        class="border rounded px-4 py-2"
+      />
+    </div>
+    <div class="flex flex-col gap-1">
+      <label for="phone" class="text-sm font-medium text-gray-700"
+        >Phone:</label
+      >
+      <input
+        id="phone"
+        type="text"
+        name="phone"
+        placeholder="Phone"
+        class="border rounded px-4 py-2"
+      />
+    </div>
+    <div class="flex flex-col gap-1">
+      <label for="department" class="text-sm font-medium text-gray-700"
+        >Department:</label
+      >
+      <input
+        id="department"
+        type="text"
+        name="department"
+        placeholder="Department"
+        class="border rounded px-4 py-2"
+      />
+    </div>
+    <div class="flex flex-col gap-1">
+      <label for="position" class="text-sm font-medium text-gray-700"
+        >Position:</label
+      >
+      <input
+        id="position"
+        type="text"
+        name="position"
+        placeholder="Position"
+        class="border rounded px-4 py-2"
+      />
+    </div>
+    <div class="flex flex-col gap-1">
+      <label for="salary" class="text-sm font-medium text-gray-700"
+        >Salary:</label
+      >
+      <input
+        id="salary"
+        type="number"
+        step="0.01"
+        name="salary"
+        placeholder="Salary"
+        class="border rounded px-4 py-2"
+      />
+    </div>
+    <div class="flex flex-col gap-1">
+      <label for="hire_date" class="text-sm font-medium text-gray-700"
+        >Hire Date:</label
+      >
+      <input
+        id="hire_date"
+        type="date"
+        name="hire_date"
+        class="border rounded px-4 py-2"
+      />
+    </div>
+
+    <div>
+      <button
+        type="submit"
+        class="bg-blue-700 text-white px-6 py-2 rounded hover:bg-blue-800"
+      >
+        Save Employee
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
