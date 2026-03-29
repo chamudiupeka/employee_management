@@ -1,82 +1,540 @@
-{% extends "base.html" %} {% block title %}Employees{% endblock %} {% block
-content %}
-<div class="flex justify-between items-center mb-6">
-  <h2 class="text-2xl font-bold">Employees</h2>
+{% extends "base.html" %} {% block title %}Employees{% endblock %} {% set
+breadcrumbs = [ {'label': 'Home', 'url': url_for('home.index')}, {'label':
+'Employees'} ] %} {% block content %}
+<!-- Header Section -->
+<div
+  class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 mb-8 text-white"
+>
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+          />
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold">Employee Directory</h2>
+        <p class="text-blue-100">Manage and view all employee records</p>
+      </div>
+    </div>
+    <a
+      href="{{ url_for('employees.create_employee') }}"
+      class="inline-flex items-center px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold rounded-xl backdrop-blur-sm transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600"
+    >
+      <svg
+        class="w-5 h-5 mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+        />
+      </svg>
+      Add Employee
+    </a>
+  </div>
+</div>
+
+<!-- Search Section -->
+<div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+  <form method="GET" class="space-y-4">
+    <div class="flex flex-col md:flex-row gap-4">
+      <div class="flex-1 relative">
+        <div
+          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+        >
+          <svg
+            class="h-5 w-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+        <input
+          type="text"
+          name="search"
+          value="{{ search or '' }}"
+          placeholder="Search by name, email, department, position..."
+          class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-300"
+        />
+      </div>
+      <div class="flex gap-3">
+        <button
+          type="submit"
+          class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          Search
+        </button>
+        {% if search %}
+        <a
+          href="{{ url_for('employees.list_employees') }}"
+          class="inline-flex items-center px-4 py-3 border-2 border-gray-300 text-gray-700 bg-white rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200"
+        >
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+          Clear
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Employee Cards/Table -->
+{% if employees %}
+<!-- Desktop Table View -->
+<div class="hidden lg:block bg-white rounded-xl shadow-lg overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+        <tr>
+          <th
+            class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+          >
+            Employee
+          </th>
+          <th
+            class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+          >
+            Contact
+          </th>
+          <th
+            class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+          >
+            Department
+          </th>
+          <th
+            class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+          >
+            Position
+          </th>
+          <th
+            class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for employee in employees %}
+        <tr class="hover:bg-gray-50 transition-colors duration-200">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-10 w-10">
+                <div
+                  class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm"
+                >
+                  {{ employee[1][0] }}{{ employee[2][0] }}
+                </div>
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-semibold text-gray-900">
+                  {{ employee[1] }} {{ employee[2] }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  Employee ID: {{ employee[0] }}
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900">{{ employee[3] }}</div>
+            <div class="text-sm text-gray-500">
+              {{ employee[4] or 'No phone' }}
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span
+              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+            >
+              {{ employee[5] or 'No department' }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span
+              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+            >
+              {{ employee[6] or 'No position' }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-center">
+            <div class="flex items-center justify-center space-x-3">
+              <!-- View Button -->
+              <a
+                href="{{ url_for('employees.employee_detail', employee_id=employee[0]) }}"
+                class="group inline-flex items-center justify-center w-9 h-9 bg-blue-100 hover:bg-blue-500 text-blue-600 hover:text-white rounded-xl transition-all duration-200 hover:scale-110 hover:shadow-lg"
+                title="View Employee Details"
+              >
+                <svg
+                  class="w-5 h-5 group-hover:scale-110 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.478 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              </a>
+
+              <!-- Edit Button -->
+              <a
+                href="{{ url_for('employees.edit_employee', employee_id=employee[0]) }}"
+                class="group inline-flex items-center justify-center w-9 h-9 bg-yellow-100 hover:bg-yellow-500 text-yellow-600 hover:text-white rounded-xl transition-all duration-200 hover:scale-110 hover:shadow-lg"
+                title="Edit Employee Information"
+              >
+                <svg
+                  class="w-5 h-5 group-hover:scale-110 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </a>
+
+              <!-- Delete Button -->
+              <button
+                type="button"
+                data-employee-id="{{ employee[0] }}"
+                data-employee-name="{{ employee[1] }} {{ employee[2] }}"
+                class="delete-btn group inline-flex items-center justify-center w-9 h-9 bg-red-100 hover:bg-red-500 text-red-600 hover:text-white rounded-xl transition-all duration-200 hover:scale-110 hover:shadow-lg"
+                title="Delete Employee"
+              >
+                <svg
+                  class="w-5 h-5 group-hover:scale-110 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<!-- Empty State -->
+<div class="bg-white rounded-xl shadow-lg p-12 text-center">
+  <div
+    class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6"
+  >
+    <svg
+      class="w-12 h-12 text-gray-400"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+      />
+    </svg>
+  </div>
+  <h3 class="text-lg font-semibold text-gray-900 mb-2">
+    {% if search %} No employees found {% else %} No employees yet {% endif %}
+  </h3>
+  <p class="text-gray-500 mb-6">
+    {% if search %} Try adjusting your search terms or
+    <a
+      href="{{ url_for('employees.list_employees') }}"
+      class="text-blue-600 hover:underline"
+      >clear the search</a
+    >
+    to see all employees. {% else %} Get started by adding your first employee
+    to the system. {% endif %}
+  </p>
+  {% if not search %}
   <a
     href="{{ url_for('employees.create_employee') }}"
-    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
   >
-    + Add Employee
+    <svg
+      class="w-5 h-5 mr-2"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+      />
+    </svg>
+    Add Your First Employee
   </a>
+  {% endif %}
 </div>
+{% endif %}
 
-<form method="GET" class="mb-6">
-  <div class="flex gap-3">
-    <input
-      type="text"
-      name="search"
-      value="{{ search }}"
-      placeholder="Search by name, email, department, position"
-      class="w-full border rounded px-4 py-2"
-    />
-    <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded">
-      Search
-    </button>
+<style>
+  /* Enhanced hover effects */
+  .hover\:scale-\[1\.02\]:hover {
+    transform: scale(1.02);
+  }
+
+  /* Custom animations for buttons */
+  button:active,
+  .button:active {
+    transform: scale(0.98) !important;
+  }
+
+  /* Smooth transitions for all interactive elements */
+  button,
+  a,
+  input {
+    transition: all 0.2s ease;
+  }
+
+  /* Enhanced focus styles */
+  button:focus,
+  a:focus {
+    outline: 2px solid rgba(59, 130, 246, 0.5);
+    outline-offset: 2px;
+  }
+
+  /* Modal animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes scaleOut {
+    from {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95) translateY(-10px);
+    }
+  }
+
+  .modal-backdrop {
+    animation: fadeIn 0.2s ease-out forwards;
+  }
+
+  .modal-backdrop.closing {
+    animation: fadeOut 0.15s ease-in forwards;
+  }
+
+  .modal-content {
+    animation: scaleIn 0.2s ease-out forwards;
+  }
+
+  .modal-content.closing {
+    animation: scaleOut 0.15s ease-in forwards;
+  }
+</style>
+
+<!-- Delete Confirmation Modal -->
+<div
+  id="deleteModal"
+  class="fixed inset-0 hidden"
+  style="z-index: 9999"
+  aria-labelledby="modal-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <!-- Backdrop -->
+  <div class="modal-backdrop fixed inset-0 bg-gray-900 bg-opacity-50"></div>
+
+  <!-- Modal Content Container -->
+  <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div
+      class="modal-content relative bg-white rounded-lg shadow-xl w-full max-w-sm z-10"
+    >
+      <!-- Body -->
+      <div class="p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4" id="modal-title">
+          Confirm Delete
+        </h3>
+        <p class="text-gray-600 text-sm">
+          Are you sure you want to delete this employee? This action cannot be
+          undone.
+        </p>
+      </div>
+
+      <!-- Footer with actions -->
+      <div class="px-6 pb-6 flex gap-3">
+        <button
+          type="button"
+          onclick="closeDeleteModal()"
+          class="flex-1 px-4 py-2.5 bg-white border border-red-700 text-gray-700 font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-200"
+        >
+          Cancel
+        </button>
+        <form id="deleteForm" method="POST" class="flex-1">
+          <button
+            type="submit"
+            class="w-full px-4 py-2.5 bg-red-700 hover:bg-red-800 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-200"
+          >
+            Delete
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
-</form>
-
-<div class="bg-white shadow rounded-lg overflow-hidden">
-  <table class="min-w-full">
-    <thead class="bg-gray-200">
-      <tr>
-        <th class="text-left px-4 py-3">Name</th>
-        <th class="text-left px-4 py-3">Email</th>
-        <th class="text-left px-4 py-3">Department</th>
-        <th class="text-left px-4 py-3">Position</th>
-        <th class="text-left px-4 py-3">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for employee in employees %}
-      <tr class="border-t">
-        <td class="px-4 py-3">{{ employee[1] }} {{ employee[2] }}</td>
-        <td class="px-4 py-3">{{ employee[3] }}</td>
-        <td class="px-4 py-3">{{ employee[4] }}</td>
-        <td class="px-4 py-3">{{ employee[5] }}</td>
-        <td class="px-4 py-3 space-x-2">
-          <a
-            href="{{ url_for('employees.employee_detail', employee_id=employee[0]) }}"
-            class="text-blue-600 hover:underline"
-            >View</a
-          >
-          <a
-            href="{{ url_for('employees.edit_employee', employee_id=employee[0]) }}"
-            class="text-yellow-600 hover:underline"
-            >Edit</a
-          >
-          <form
-            action="{{ url_for('employees.delete_employee', employee_id=employee[0]) }}"
-            method="POST"
-            class="inline"
-          >
-            <button
-              type="submit"
-              class="text-red-600 hover:underline"
-              onclick="return confirm('Delete this employee?');"
-            >
-              Delete
-            </button>
-          </form>
-        </td>
-      </tr>
-      {% else %}
-      <tr>
-        <td colspan="5" class="px-4 py-4 text-center text-gray-500">
-          No employees found.
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
 </div>
+
+<script>
+  const deleteModal = document.getElementById('deleteModal');
+  const deleteForm = document.getElementById('deleteForm');
+  const modalBackdrop = deleteModal.querySelector('.modal-backdrop');
+  const modalContent = deleteModal.querySelector('.modal-content');
+  const modalWrapper = modalContent.parentElement;
+
+  function openDeleteModal(employeeId, employeeName) {
+    // Set the form action
+    deleteForm.action = `/employees/${employeeId}/delete`;
+
+    // Show modal
+    deleteModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    // Focus on cancel button for accessibility
+    setTimeout(() => {
+      deleteModal.querySelector('button[type="button"]').focus();
+    }, 100);
+  }
+
+  function closeDeleteModal() {
+    // Add closing animation classes
+    modalBackdrop.classList.add('closing');
+    modalContent.classList.add('closing');
+
+    // Wait for animation to complete before hiding
+    setTimeout(() => {
+      deleteModal.classList.add('hidden');
+      document.body.style.overflow = '';
+
+      // Remove closing classes for next open
+      modalBackdrop.classList.remove('closing');
+      modalContent.classList.remove('closing');
+    }, 150);
+  }
+
+  // Attach click handlers to all delete buttons
+  document.querySelectorAll('.delete-btn').forEach((btn) => {
+    btn.addEventListener('click', function () {
+      const employeeId = this.dataset.employeeId;
+      const employeeName = this.dataset.employeeName;
+      openDeleteModal(employeeId, employeeName);
+    });
+  });
+
+  // Close modal when clicking on backdrop or wrapper (outside modal content)
+  modalWrapper.addEventListener('click', (e) => {
+    if (e.target === modalWrapper) {
+      closeDeleteModal();
+    }
+  });
+
+  modalBackdrop.addEventListener('click', () => {
+    closeDeleteModal();
+  });
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !deleteModal.classList.contains('hidden')) {
+      closeDeleteModal();
+    }
+  });
+</script>
 {% endblock %}

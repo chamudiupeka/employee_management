@@ -57,14 +57,14 @@ def login():
             session.clear()
             session["user_id"] = user[0]
             flash("Login successful!", "success")
-            return redirect(url_for("employees.list_employees"))
+            return redirect(url_for("home.index"))
 
         flash(error, "error")
 
     return render_template("auth/login.html")
 
 
-@auth_bp.route("/logout")
+@auth_bp.route("/logout", methods=["POST"])
 def logout():
     session.clear()
     flash("You have been logged out.", "success")
