@@ -1,11 +1,13 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from app.db import get_db
+from app.blueprints.auth.routes import login_required
 
 employees_bp = Blueprint("employees", __name__)
 
 
 @employees_bp.route("/")
+@login_required
 def list_employees():
     search = request.args.get("search", "").strip()
     db = get_db()
@@ -40,6 +42,7 @@ def list_employees():
 
 
 @employees_bp.route("/create", methods=["GET", "POST"])
+@login_required
 def create_employee():
     if request.method == "POST":
         first_name = request.form["first_name"]
@@ -72,6 +75,7 @@ def create_employee():
     return render_template("employees/create.html")
 
 
+@login_required
 @employees_bp.route("/<int:employee_id>")
 def employee_detail(employee_id):
     db = get_db()
@@ -93,6 +97,7 @@ def employee_detail(employee_id):
     return render_template("employees/detail.html", employee=employee)
 
 
+@login_required
 @employees_bp.route("/<int:employee_id>/edit", methods=["GET", "POST"])
 def edit_employee(employee_id):
     db = get_db()
@@ -150,6 +155,7 @@ def edit_employee(employee_id):
 
 
 @employees_bp.route("/<int:employee_id>/delete", methods=["POST"])
+@login_required
 def delete_employee(employee_id):
     db = get_db()
     try:
